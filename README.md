@@ -61,10 +61,18 @@ Store 是单工作者、维护窗口使用的连接对象。transaction(label) �
 - trend/tasks.py：固定任务与组合身份。
 - trend/analysis.py：SDK1 精确分析。
 - trend/reports.py：数值报告、终态、回执的整笔发布和读取。
+- trend/calibration.py：共享校准修订、校准头与校准请求回执。
+- trend/joint.py：固定联合任务的整批校验、冻结绑定与来源读取。
+- trend/joint_math.py：共享单个 Z 的全量精确联合核（形式 D 弥散极限）。
+- trend/joint_analysis.py：按冻结绑定执行联合分析。
+- trend/joint_reports.py：联合报告、终态与回执的整笔发布和读取。
 - trend/db.py：SQLite Schema、事务、公开 Store 门面。
 - trend/samples.py：通过公开接口构造五个修订、六个任务，包含 pending/done/error。
 - vendor/trend1.py、vendor/rational.py：实际使用的旧数值端口和精确弥散运算。
 - vendor/gaussian2.py：可独立使用的正常高斯端口，不接入当前归档。
-- tests/：完整原业务回归及数值端口对照。
+- tests/：完整原业务回归、数值端口对照与独立联合核账。
+- JOINT.md、JOINT_HANDOFF.md：共享校准联合任务的业务规范与交接说明。
+
+共享校准联合能力（`apply_calibration`、`create_joint_task`、`analyze_joint` 等）的完整接口、数值语义、固定身份与原子边界见 JOINT.md，实现到发布的传递链与核验入口见 JOINT_HANDOFF.md；手算数据见 joint_examples.py。
 
 状态格式、表关系与数值端口见 PORTS.md。当前产品不做模型拟合、季节模型、在线迁移或可视化。

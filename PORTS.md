@@ -52,3 +52,14 @@ JSON 对象键排序，紧凑编码。Fraction 输出用 {"$fraction":"分子/�
 trend.samples.build(store) 使用真实 apply/create_task/analyze 构造完整旧样本。既包含没有执行的冻结任务，也包含成功 SDK1 状态与错误回执；SDK1 状态不是只有 JSON 原文而未使用的占位字段。
 
 reports、任务成功终态、task_receipts 在 publish 事务中同时写入。失败时三者全部回滚。矛盾观测只发布错误终态及回执，不产生 reports 行。修订接纳和头/请求回执也在同一事务。所有历史报告保持其原来源绑定。
+
+## 共享校准扩展（同库追加表）
+
+- calibration_revisions：独立自增主键 calibration_revision（与 revisions 主键是不同身份空间）、calibration 名、规范 mean/variance 有理字符串。
+- calibration_heads：每校准当前 calibration_revision。
+- calibration_receipts：全局 request 主键（与 apply_receipts 的 request 空间分开）、规范 payload、接纳修订、原 receipt。
+- joint_tasks：task 主键（与 tasks 身份分开）、固定 calibration_revision、原序冻结 bindings 的 JSON（id、series、revision、prefix、规范 loading 字符串）、原序 queries（term 为 [绑定id, 时间, 系数字符串]）、pending/done/error 与错误文本。
+- joint_reports：成功联合 task 主键、数值 report、实际参与条件化与投影的 joint.trajectory/1 checkpoint（含 binding_ids、z_index、RF 均值与完整协方差）。
+- joint_task_receipts：终态联合 task 主键与 `joint-analysis:<task>` 回执。
+
+联合事务标签为 apply_calibration、create_joint_task、publish_joint，沿用同一 before_commit 钩子与整笔回滚规则。旧库重开时新表由 SCHEMA 的 CREATE TABLE IF NOT EXISTS 补齐，旧行不迁移、不重写。
